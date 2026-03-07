@@ -15,9 +15,14 @@ import BookingList from './pages/bookings/BookingList';
 import TicketList from './pages/tickets/TicketList';
 import NotificationPanel from './pages/notifications/NotificationPanel';
 
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
+
 // Auth
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminRoute from './components/common/AdminRoute';
 
 function App() {
   return (
@@ -38,6 +43,12 @@ function App() {
               <Route path="/bookings" element={<BookingList />} />
               <Route path="/tickets" element={<TicketList />} />
               <Route path="/notifications" element={<NotificationPanel />} />
+
+              {/* Admin-only routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<UserManagement />} />
+              </Route>
             </Route>
           </Route>
         </Routes>
