@@ -1,36 +1,46 @@
 package com.smartcampus.controller;
 
 import com.smartcampus.dto.response.ApiResponse;
+import com.smartcampus.dto.response.UserResponse;
+import com.smartcampus.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    // TODO: Inject UserService
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
-        // TODO: Return list of all users (ADMIN only)
-        return ResponseEntity.ok(ApiResponse.success("Get all users endpoint - implement me!"));
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", users));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
-        // TODO: Return user by ID
-        return ResponseEntity.ok(ApiResponse.success("Get user by ID endpoint - implement me!"));
+        UserResponse user = userService.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.success(user));
     }
 
     @PutMapping("/{id}/role")
-    public ResponseEntity<?> updateUserRole(@PathVariable String id /*, @RequestBody Map<String, String> body */) {
-        // TODO: Update user role (ADMIN only)
-        return ResponseEntity.ok(ApiResponse.success("Update user role endpoint - implement me!"));
+    public ResponseEntity<?> updateUserRole(@PathVariable String id, @RequestBody Map<String, String> body) {
+        String newRole = body.get("role");
+        UserResponse updatedUser = userService.updateUserRole(id, newRole);
+        return ResponseEntity.ok(ApiResponse.success("Role updated successfully", updatedUser));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        // TODO: Delete user (ADMIN only)
-        return ResponseEntity.ok(ApiResponse.success("Delete user endpoint - implement me!"));
+        userService.deleteUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User deleted successfully"));
     }
 }
