@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FiTrash2, FiShield, FiSearch } from 'react-icons/fi';
+import { FiTrash2, FiSearch } from 'react-icons/fi';
 import userService from '../../services/userService';
 
 const ROLES = ['USER', 'ADMIN', 'TECHNICIAN', 'MANAGER'];
@@ -25,17 +25,8 @@ const UserManagement = () => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            // TODO: Uncomment when backend is ready
-            // const { data } = await userService.getAll();
-            // setUsers(data.data || data);
-
-            // Demo data for development
-            setUsers([
-                { id: '1', firstName: 'Adeesha', lastName: 'Perera', email: 'adeesha@example.com', role: 'ADMIN', authProvider: 'LOCAL', createdAt: '2026-03-01' },
-                { id: '2', firstName: 'Imasha', lastName: 'Silva', email: 'imasha@example.com', role: 'USER', authProvider: 'LOCAL', createdAt: '2026-03-02' },
-                { id: '3', firstName: 'Lumini', lastName: 'Fernando', email: 'lumini@example.com', role: 'USER', authProvider: 'GOOGLE', createdAt: '2026-03-03' },
-                { id: '4', firstName: 'Sathira', lastName: 'Kumara', email: 'sathira@example.com', role: 'TECHNICIAN', authProvider: 'LOCAL', createdAt: '2026-03-04' },
-            ]);
+            const { data } = await userService.getAll();
+            setUsers(data.data || []);
         } catch (error) {
             toast.error('Failed to fetch users');
         } finally {
@@ -45,20 +36,19 @@ const UserManagement = () => {
 
     const handleRoleChange = async (userId, newRole) => {
         try {
-            // TODO: Uncomment when backend is ready
-            // await userService.updateRole(userId, newRole);
+            await userService.updateRole(userId, newRole);
             setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
             toast.success(`Role updated to ${newRole}`);
         } catch (error) {
             toast.error('Failed to update role');
+            fetchUsers(); // re-fetch to reset state
         }
     };
 
     const handleDelete = async (userId, userName) => {
         if (!window.confirm(`Are you sure you want to delete ${userName}?`)) return;
         try {
-            // TODO: Uncomment when backend is ready
-            // await userService.delete(userId);
+            await userService.delete(userId);
             setUsers(users.filter(u => u.id !== userId));
             toast.success('User deleted');
         } catch (error) {
@@ -113,7 +103,6 @@ const UserManagement = () => {
                         <tr style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}>
                             <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>User</th>
                             <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Email</th>
-                            <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Provider</th>
                             <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Role</th>
                             <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Actions</th>
                         </tr>
@@ -138,17 +127,6 @@ const UserManagement = () => {
 
                                 {/* Email */}
                                 <td style={{ padding: '0.75rem 1rem', color: 'var(--text-muted)' }}>{user.email}</td>
-
-                                {/* Auth Provider */}
-                                <td style={{ padding: '0.75rem 1rem' }}>
-                                    <span style={{
-                                        padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600,
-                                        background: user.authProvider === 'GOOGLE' ? '#fef3c7' : '#f3f4f6',
-                                        color: user.authProvider === 'GOOGLE' ? '#d97706' : '#6b7280',
-                                    }}>
-                                        {user.authProvider === 'GOOGLE' ? '🔵 Google' : '🔒 Local'}
-                                    </span>
-                                </td>
 
                                 {/* Role Dropdown */}
                                 <td style={{ padding: '0.75rem 1rem' }}>
