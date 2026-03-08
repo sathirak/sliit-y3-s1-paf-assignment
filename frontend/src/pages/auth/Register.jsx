@@ -1,18 +1,29 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import authService from '../../services/authService';
 
 const Register = () => {
     const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Call authService.register(form)
-        // TODO: On success, navigate to /login
-        toast.info('Registration not implemented yet — connect to backend');
+        setLoading(true);
+
+        try {
+            await authService.register(form);
+            toast.success('Account created successfully! Please sign in.');
+            navigate('/login');
+        } catch (err) {
+            const message = err.response?.data?.message || 'Registration failed. Please try again.';
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -46,8 +57,8 @@ const Register = () => {
                         <label>Password</label>
                         <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min 6 characters" required minLength={6} />
                     </div>
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-                        Register
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} disabled={loading}>
+                        {loading ? 'Creating Account...' : 'Register'}
                     </button>
                 </form>
 
