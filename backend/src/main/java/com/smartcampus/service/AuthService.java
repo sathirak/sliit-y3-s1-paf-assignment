@@ -16,13 +16,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailService emailService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtTokenProvider jwtTokenProvider) {
+                       JwtTokenProvider jwtTokenProvider,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.emailService = emailService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -43,6 +46,9 @@ public class AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        // Send welcome email (async — won't block response)
+        emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFirstName());
 
         // Generate JWT token
         String token = jwtTokenProvider.generateToken(savedUser);

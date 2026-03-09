@@ -5,11 +5,11 @@ import Footer from './Footer';
 
 const Layout = () => {
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="layout">
             <Navbar />
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div className="layout-body">
                 <Sidebar />
-                <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
+                <main className="main-content">
                     <Outlet />
                     <Footer />
                 </main>
