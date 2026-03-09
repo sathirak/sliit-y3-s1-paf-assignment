@@ -1,22 +1,73 @@
 package com.smartcampus.service;
 
+import com.smartcampus.exception.ResourceNotFoundException;
+import com.smartcampus.model.Notification;
+import com.smartcampus.repository.NotificationRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class NotificationService {
 
-    // TODO: Inject NotificationRepository
+    private final NotificationRepository notificationRepository;
 
-    // TODO: Implement createNotification(String userId, String title, String message, Notification.Type type)
-    //   → Use this method from other services when events happen (booking approved, ticket assigned, etc.)
+    public NotificationService(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 
-    // TODO: Implement getUserNotifications(String userId) → List<Notification>
+    public Notification createNotification(String userId, String title, String message, Notification.Type type) {
+        Notification notification = Notification.builder()
+                .userId(userId)
+                .title(title)
+                .message(message)
+                .type(type)
+                .read(false)
+                .build();
 
-    // TODO: Implement getUnreadCount(String userId) → long
+        return notificationRepository.save(notification);
+    }
 
-    // TODO: Implement markAsRead(String notificationId)
+    public Notification createNotification(String userId, String title, String message,
+                                           Notification.Type type, String referenceId, String referenceType) {
+        Notification notification = Notification.builder()
+                .userId(userId)
+                .title(title)
+                .message(message)
+                .type(type)
+                .referenceId(referenceId)
+                .referenceType(referenceType)
+                .read(false)
+                .build();
 
-    // TODO: Implement markAllAsRead(String userId)
+        return notificationRepository.save(notification);
+    }
 
-    // TODO: Implement deleteNotification(String notificationId)
+    public List<Notification> getUserNotifications(String userId) {
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    public long getUnreadCount(String userId) {
+        return notificationRepository.countByUserIdAndReadFalse(userId);
+    }
+
+    public Notification markAsRead(String notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + notificationId));
+        notification.setRead(true);
+        return notificationRepository.save(notification);
+    }
+
+    public void markAllAsRead(String userId) {
+        List<Notification> unread = notificationRepository.findByUserIdAndReadFalse(userId);
+        unread.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(unread);
+    }
+
+    public void deleteNotification(String notificationId) {
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new ResourceNotFoundException("Notification not found with id: " + notificationId);
+        }
+        notificationRepository.deleteById(notificationId);
+    }
 }

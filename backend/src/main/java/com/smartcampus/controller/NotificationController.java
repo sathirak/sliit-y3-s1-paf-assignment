@@ -1,42 +1,55 @@
 package com.smartcampus.controller;
 
 import com.smartcampus.dto.response.ApiResponse;
+import com.smartcampus.model.Notification;
+import com.smartcampus.security.UserPrincipal;
+import com.smartcampus.service.NotificationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-    // TODO: Inject NotificationService
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @GetMapping
-    public ResponseEntity<?> getUserNotifications(/* Authentication authentication */) {
-        // TODO: Get current user's notifications
-        return ResponseEntity.ok(ApiResponse.success("Get notifications endpoint - implement me!"));
+    public ResponseEntity<?> getUserNotifications(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        List<Notification> notifications = notificationService.getUserNotifications(userPrincipal.getId());
+        return ResponseEntity.ok(ApiResponse.success("Notifications retrieved", notifications));
     }
 
     @GetMapping("/unread-count")
-    public ResponseEntity<?> getUnreadCount(/* Authentication authentication */) {
-        // TODO: Get unread notification count for current user
-        return ResponseEntity.ok(ApiResponse.success("Unread count endpoint - implement me!"));
+    public ResponseEntity<?> getUnreadCount(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        long count = notificationService.getUnreadCount(userPrincipal.getId());
+        return ResponseEntity.ok(ApiResponse.success("Unread count retrieved", count));
     }
 
     @PutMapping("/{id}/read")
     public ResponseEntity<?> markAsRead(@PathVariable String id) {
-        // TODO: Mark a single notification as read
-        return ResponseEntity.ok(ApiResponse.success("Mark as read endpoint - implement me!"));
+        Notification notification = notificationService.markAsRead(id);
+        return ResponseEntity.ok(ApiResponse.success("Notification marked as read", notification));
     }
 
     @PutMapping("/read-all")
-    public ResponseEntity<?> markAllAsRead(/* Authentication authentication */) {
-        // TODO: Mark all notifications as read for current user
-        return ResponseEntity.ok(ApiResponse.success("Mark all as read endpoint - implement me!"));
+    public ResponseEntity<?> markAllAsRead(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        notificationService.markAllAsRead(userPrincipal.getId());
+        return ResponseEntity.ok(ApiResponse.success("All notifications marked as read"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable String id) {
-        // TODO: Delete a notification
-        return ResponseEntity.ok(ApiResponse.success("Delete notification endpoint - implement me!"));
+        notificationService.deleteNotification(id);
+        return ResponseEntity.ok(ApiResponse.success("Notification deleted"));
     }
 }
