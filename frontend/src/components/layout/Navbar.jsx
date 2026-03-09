@@ -1,40 +1,38 @@
 import { Link } from 'react-router-dom';
-import { FiBell } from 'react-icons/fi';
+import { FiBell, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
+import useNotifications from '../../hooks/useNotifications';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    const { unreadCount } = useNotifications();
 
     return (
-        <nav style={{
-            height: 'var(--navbar-height)',
-            background: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 1.5rem',
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-        }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--primary)' }}>
-                🏫 Smart Campus
-            </h2>
+        <nav className="navbar">
+            <div className="navbar-brand">
+                <span className="brand-dot"></span>
+                Smart Campus
+            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                {/* Notification Bell — TODO: add unread badge */}
-                <Link to="/notifications" style={{ color: 'var(--text-muted)', fontSize: '1.25rem' }}>
+            <div className="navbar-actions">
+                <Link to="/notifications" className="notification-btn">
                     <FiBell />
+                    {unreadCount > 0 && (
+                        <span className="notification-badge">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                    )}
                 </Link>
 
-                {/* User Info */}
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                    {user?.email || 'User'}
-                </span>
+                <div className="navbar-user">
+                    <div>
+                        <div className="user-name">{user?.firstName || user?.email || 'User'}</div>
+                        <div className="user-role">{user?.role || 'USER'}</div>
+                    </div>
+                </div>
 
-                <button onClick={logout} className="btn btn-outline" style={{ fontSize: '0.75rem' }}>
-                    Logout
+                <button onClick={logout} className="btn btn-ghost" title="Logout" style={{ fontSize: '1.1rem' }}>
+                    <FiLogOut />
                 </button>
             </div>
         </nav>
