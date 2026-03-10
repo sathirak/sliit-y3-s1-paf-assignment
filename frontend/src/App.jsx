@@ -9,6 +9,7 @@ import Layout from './components/layout/Layout';
 // Pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import OAuth2Redirect from './pages/auth/OAuth2Redirect';
 import Dashboard from './pages/dashboard/Dashboard';
 import FacilitiesList from './pages/facilities/FacilitiesList';
 import BookingList from './pages/bookings/BookingList';
@@ -33,6 +34,7 @@ function App() {
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
 
           {/* Protected routes — wrapped in Layout */}
           <Route element={<ProtectedRoute />}>
